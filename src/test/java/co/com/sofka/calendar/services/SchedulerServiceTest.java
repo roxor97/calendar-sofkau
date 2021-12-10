@@ -32,6 +32,7 @@ class SchedulerServiceTest {
     ProgramRepository repository;
 
     @Test
+   
     void generateCalendar() {
         var programId = "xxxx";
         var startDate = LocalDate.of(2022, 1, 1);
@@ -108,11 +109,14 @@ class SchedulerServiceTest {
 
         Mockito.when(repository.findById(programId)).thenReturn(Mono.empty());
 
+       
+
         Flux<ProgramDate> response = schedulerService.generateCalendar(programId, startDate);
 
-        StepVerifier.create(response).verifyError(RuntimeException.class);
+        StepVerifier.create(response)
+                .expectErrorMessage("no se encontro el programa academico")
+                .verify();
 
-        
         Mockito.verify(repository).findById(programId);
 
 

@@ -31,7 +31,7 @@ public class SchedulerService {
         return program
                 .flatMapMany(programa -> Flux.fromStream(getDurationOf(programa)))
                 .map(toProgramDate(startDate, endDate, pivot[0], index))
-                .switchIfEmpty(Mono.error(new RuntimeException("empty object")));
+                .switchIfEmpty(Mono.error(new RuntimeException("no se encontro el programa academico")));
     }
 
     //No tocar
