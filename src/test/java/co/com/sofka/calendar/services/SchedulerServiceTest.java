@@ -31,9 +31,7 @@ class SchedulerServiceTest {
     @Mock
     ProgramRepository repository;
 
-
     @Test
-        //TODO: modificar el test para que el act sea reactivo, usando stepverifier
     void generateCalendar() {
         var programId = "xxxx";
         var startDate = LocalDate.of(2022, 1, 1);
@@ -41,11 +39,66 @@ class SchedulerServiceTest {
         Program program = getProgramDummy();
 
         Mockito.when(repository.findById(programId)).thenReturn(Mono.just(program));
-        
+
         Flux<ProgramDate> response = schedulerService.generateCalendar(programId, startDate);
-        
+
+        StepVerifier.create(response)
+                .expectNextMatches(programDate -> {
+                    return programDate.getDate().toString().equals("2022-01-03")
+                            && programDate.getCategoryName().equals("Principios");
+                })
+                .expectNextMatches(programDate -> {
+                    return programDate.getDate().toString().equals("2022-01-04")
+                            && programDate.getCategoryName().equals("Principios");
+                })
+                .expectNextMatches(programDate -> {
+                    return programDate.getDate().toString().equals("2022-01-05")
+                            && programDate.getCategoryName().equals("Bases");
+                })
+                .expectNextMatches(programDate -> {
+                    return programDate.getDate().toString().equals("2022-01-06")
+                            && programDate.getCategoryName().equals("Bases");
+                })
+                .expectNextMatches(programDate -> {
+                    return programDate.getDate().toString().equals("2022-01-07")
+                            && programDate.getCategoryName().equals("Fundamentos");
+                })
+                .expectNextMatches(programDate -> {
+                    return programDate.getDate().toString().equals("2022-01-10")
+                            && programDate.getCategoryName().equals("Fundamentos");
+                })
+                .expectNextMatches(programDate -> {
+                    return programDate.getDate().toString().equals("2022-01-11")
+                            && programDate.getCategoryName().equals("Fundamentos");
+                })
+                .expectNextMatches(programDate -> {
+                    return programDate.getDate().toString().equals("2022-01-12")
+                            && programDate.getCategoryName().equals("Fundamentos");
+                })
+                .expectNextMatches(programDate -> {
+                    return programDate.getDate().toString().equals("2022-01-13")
+                            && programDate.getCategoryName().equals("Fundamentos avazandos");
+                })
+                .expectNextMatches(programDate -> {
+                    return programDate.getDate().toString().equals("2022-01-14")
+                            && programDate.getCategoryName().equals("Fundamentos avazandos");
+                })
+                .expectNextMatches(programDate -> {
+                    return programDate.getDate().toString().equals("2022-01-17")
+                            && programDate.getCategoryName().equals("Fundamentos avazandos");
+                })
+                .expectNextMatches(programDate -> {
+                    return programDate.getDate().toString().equals("2022-01-18")
+                            && programDate.getCategoryName().equals("Fundamentos avazandos");
+                })
+                .expectNextMatches(programDate -> {
+                    return programDate.getDate().toString().equals("2022-01-19")
+                            && programDate.getCategoryName().equals("Fundamentos avazandos");
+                })
+                .verifyComplete();
+
         StepVerifier.create(response).expectNextCount(13).verifyComplete();
-    
+        Mockito.verify(repository).findById(programId);
     }
 
     @Test
@@ -55,17 +108,17 @@ class SchedulerServiceTest {
 
         Mockito.when(repository.findById(programId)).thenReturn(Mono.empty());
 
-        //TODO: hacer de otro modo
-        var exception = Assertions.assertThrows(RuntimeException.class, () -> {
-            schedulerService.generateCalendar(programId, startDate);//TODO: hacer una subscripción de el servicio reactivo
+        Flux<ProgramDate> response = schedulerService.generateCalendar(programId, startDate);
 
-        });
-        Assertions.assertEquals("El programa academnico no existe", exception.getMessage());//TODO: hacer de otro modo
+        StepVerifier.create(response).verifyError(RuntimeException.class);
+
+        
         Mockito.verify(repository).findById(programId);
+
 
     }
 
-    //no tocar
+    // no tocar
     private Program getProgramDummy() {
         var program = new Program();
         program.setId("xxxx");
@@ -81,10 +134,9 @@ class SchedulerServiceTest {
         return program;
     }
 
-    //no tocar
+    // no tocar
     private String getSnapResult() {
         return "[{\"categoryName\":\"Principios\",\"date\":{\"year\":2022,\"month\":1,\"day\":3}},{\"categoryName\":\"Principios\",\"date\":{\"year\":2022,\"month\":1,\"day\":4}},{\"categoryName\":\"Bases\",\"date\":{\"year\":2022,\"month\":1,\"day\":5}},{\"categoryName\":\"Bases\",\"date\":{\"year\":2022,\"month\":1,\"day\":6}},{\"categoryName\":\"Fundamentos\",\"date\":{\"year\":2022,\"month\":1,\"day\":7}},{\"categoryName\":\"Fundamentos\",\"date\":{\"year\":2022,\"month\":1,\"day\":10}},{\"categoryName\":\"Fundamentos\",\"date\":{\"year\":2022,\"month\":1,\"day\":11}},{\"categoryName\":\"Fundamentos\",\"date\":{\"year\":2022,\"month\":1,\"day\":12}},{\"categoryName\":\"Fundamentos avazandos\",\"date\":{\"year\":2022,\"month\":1,\"day\":13}},{\"categoryName\":\"Fundamentos avazandos\",\"date\":{\"year\":2022,\"month\":1,\"day\":14}},{\"categoryName\":\"Fundamentos avazandos\",\"date\":{\"year\":2022,\"month\":1,\"day\":17}},{\"categoryName\":\"Fundamentos avazandos\",\"date\":{\"year\":2022,\"month\":1,\"day\":18}},{\"categoryName\":\"Fundamentos avazandos\",\"date\":{\"year\":2022,\"month\":1,\"day\":19}}]";
     }
-
 
 }
